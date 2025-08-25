@@ -1,0 +1,53 @@
+{
+  "name": "hotel-offer-orchestrator",
+  "version": "1.0.0",
+  "description": "Hotel offer aggregation system using Temporal.io, Express, and Redis",
+  "author": "Ankit Aditya <ankit.see@gmail.com>",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "temporal:worker": "ts-node-dev --respawn --transpile-only src/temporal/worker.ts",
+    "temporal:worker:prod": "node dist/temporal/worker.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "hotel",
+    "orchestrator",
+    "temporal",
+    "express",
+    "redis"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ankitaditya/hotel-offer-orchestrator.git"
+  },
+  "homepage": "https://github.com/ankitaditya/hotel-offer-orchestrator#readme",
+  "bugs": {
+    "url": "https://github.com/ankitaditya/hotel-offer-orchestrator/issues"
+  },
+  "dependencies": {
+    "@temporalio/activity": "^1.12.3",
+    "@temporalio/client": "^1.12.3",
+    "@temporalio/worker": "^1.12.3",
+    "@temporalio/workflow": "^1.12.3",
+    "axios": "^1.11.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.1",
+    "redis": "^5.8.2"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.9.36",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.23",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^24.3.0",
+    "nodemon": "^3.1.10",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.2"
+  }
+}

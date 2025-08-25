@@ -1,0 +1,106 @@
+# Hotel Offer Orchestrator - Docker Compose Configuration
+# Author: Ankit Aditya <ankit.see@gmail.com>
+# Description: Multi-service setup for hotel aggregation system
+
+version: '3.8'
+
+services:
+  # Temporal Server
+  temporal:
+    image: temporalio/auto-setup:1.22.0
+    ports:
+      - "7233:7233"
+      - "8233:8233"
+    environment:
+      - DB=postgresql
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=postgresql
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    volumes:
+      - ./temporal-config:/etc/temporal/config/dynamicconfig
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 5 bash -c 'cat < /dev/null > /dev/tcp/localhost/7233' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # PostgreSQL for Temporal
+  postgresql:
+    image: postgres:13
+    environment:
+      POSTGRES_PASSWORD: temporal
+      POSTGRES_USER: temporal
+      POSTGRES_DB: temporal
+    ports:
+      - "5432:5432"
+    volumes:
+      - temporal-postgres-data:/var/lib/postgresql/data
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U temporal"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - hotel-network
+    command: redis-server --appendonly yes
+
+  # Hotel Orchestrator API
+  hotel-api:
+    build: .
+    ports:
+      - "3000:3000"
+      - "12000:3000"  # Additional port for external access
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - REDIS_URL=redis://redis:6379
+      - BASE_URL=http://hotel-api:3000
+    depends_on:
+      - redis
+      - temporal
+    networks:
+      - hotel-network
+    restart: unless-stopped
+
+  # Temporal Worker (separate container for the worker)
+  # temporal-worker:
+  #   build: .
+  #   environment:
+  #     - NODE_ENV=production
+  #     - REDIS_URL=redis://redis:6379
+  #     - BASE_URL=http://hotel-api:3000
+  #   depends_on:
+  #     temporal:
+  #       condition: service_healthy
+  #     hotel-api:
+  #       condition: service_started
+  #   networks:
+  #     - hotel-network
+  #   command: ["npm", "run", "temporal:worker"]
+  #   restart: unless-stopped
+
+volumes:
+  temporal-postgres-data:
+  redis-data:
+
+networks:
+  hotel-network:
+    driver: bridge

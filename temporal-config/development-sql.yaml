@@ -1,0 +1,18 @@
+# Temporal Configuration for Hotel Offer Orchestrator
+# Author: Ankit Aditya <ankit.see@gmail.com>
+
+system.forceSearchAttributesCacheRefreshOnRead:
+  - value: true
+    constraints: {}
+
+system.enableCrossNamespaceCommands:
+  - value: true
+    constraints: {}
+
+frontend.enableUpdateWorkflowExecution:
+  - value: true
+    constraints: {}
+
+frontend.enableUpdateWorkflowExecutionAsyncAccepted:
+  - value: true
+    constraints: {}
