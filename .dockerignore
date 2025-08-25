@@ -1,0 +1,14 @@
+# Hotel Offer Orchestrator - Docker Ignore
+# Author: Ankit Aditya <ankit.see@gmail.com>
+
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+.env
+.nyc_output
+coverage
+.vscode
+dist
+*.log
